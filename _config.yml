@@ -1,0 +1,9 @@
+# Keep the Flask backend and build tooling out of the GitHub Pages site
+exclude:
+  - backend
+  - Makefile
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - requirements.txt

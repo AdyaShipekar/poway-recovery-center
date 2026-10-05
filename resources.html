@@ -15,7 +15,7 @@
 <section class="section-shell resource-layout" id="mood-room">
 <div class="section-heading"><p class="eyebrow">Interactive tool</p><h2>The Mood Room</h2><p>Tell us what is happening in your own words. This local demo uses supportive keyword-based categorization; it does not diagnose or replace professional care.</p></div>
 <div class="mood-room">
-<div class="mood-input-panel"><label for="mood-input">What is your current situation?</label><textarea id="mood-input" placeholder="For example: I feel restless and my thoughts are racing…"></textarea><button class="button button-primary" id="enter-room">Enter my room</button><p class="small-note">You can be vague. No account or identifying information is required.</p></div>
+<div class="mood-input-panel"><label for="mood-input">What is your current situation?</label><textarea id="mood-input" placeholder="Something like: I feel restless and my thoughts are racing…"></textarea><button class="button button-primary" id="enter-room">Enter my room</button><p class="small-note">You can be vague. No account or identifying information is required.</p></div>
 <div class="mood-result" id="mood-result" hidden><div class="room-top"><span id="mood-label">A room for grounding</span><button id="reset-room">Start over</button></div><h3 id="mood-title">Let’s lower the intensity, one minute at a time.</h3><p id="mood-description"></p><div class="music-card"><div><span class="music-kicker">Soundtrack</span><strong id="music-title">Calm focus</strong><small id="music-description"></small></div><a id="music-link" href="https://music.apple.com/" target="_blank" rel="noopener">Open Apple Music ↗</a></div><label class="toggle-row"><span>Show lyrics when available</span><input type="checkbox" id="lyrics-toggle"><span class="switch"></span></label><div class="room-actions"><button class="button button-secondary" id="grounding-prompt">Give me a grounding prompt</button><p id="grounding-text"></p></div></div>
 </div>
 </section>
@@ -28,5 +28,5 @@
 <a class="directory-card" href="https://www.sandiegocounty.gov/content/sdc/hhsa/programs/bhs.html" target="_blank" rel="noopener"><span>Local behavioral health</span><h3>San Diego County BHS</h3><p>County behavioral health information, services, and access points.</p><strong>Explore county services →</strong></a>
 </div></section>
 </main>
-<script src="js/main.js"></script><script src="js/resources.js"></script>
+<script src="js/main.js"></script><script type="module" src="js/api/login.js"></script><script src="js/resources.js"></script>
 </body></html>
