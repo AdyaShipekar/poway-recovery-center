@@ -1,5 +1,6 @@
 // Backend address (same structure as Open Coding Society pages assets/js/api/config.js)
-// Deployed: put the https address of the deployed backend/ (see backend/Dockerfile) here.
+// Locally: run `make` in the poway-recovery-center-api repo (port 8587).
+// Deployed: put the https address of the deployed poway-recovery-center-api here.
 const deployedPythonURI = "";
 
 export var pythonURI;

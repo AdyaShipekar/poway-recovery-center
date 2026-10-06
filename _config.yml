@@ -11,7 +11,3 @@ exclude:
 # Custom excludes
   - Makefile
   - README.md
-  - requirements.txt
-  - backend
-  - venv
-  - .venv

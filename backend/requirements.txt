@@ -1,8 +1,0 @@
-flask
-flask-cors
-flask-restful
-flask-sqlalchemy
-pyjwt
-python-dotenv
-werkzeug
-gunicorn
