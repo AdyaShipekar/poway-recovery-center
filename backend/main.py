@@ -18,7 +18,6 @@ from functools import wraps
 import jwt
 from dotenv import load_dotenv
 from flask import Flask, Blueprint, request, current_app, g, jsonify
-from flask.cli import AppGroup
 from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
@@ -40,7 +39,6 @@ app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
 
 # Configure Flask Port, default to 8587 which is the same as Open Coding Society flask
 app.config['FLASK_PORT'] = int(os.environ.get('FLASK_PORT') or 8587)
-app.config['JSON_AS_ASCII'] = False  # Allow emojis, non-ASCII characters in JSON responses
 
 # Allowed servers for cross-origin resource sharing (CORS)
 allowed_origins = [
@@ -48,8 +46,9 @@ allowed_origins = [
     'http://127.0.0.1:4000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'https://adyashipekar.github.io',  # Deployed GitHub Pages site
 ]
-# Deployed frontend(s), e.g. the GitHub Pages site, comma separated in .env
+# Any other deployed frontend(s), comma separated in .env
 allowed_origins += [o.strip() for o in (os.environ.get('ALLOWED_ORIGINS') or '').split(',') if o.strip()]
 
 cors = CORS(
@@ -66,6 +65,15 @@ app.config['ADMIN_EMAIL'] = os.environ.get('ADMIN_EMAIL') or 'adya.shipekar1@gma
 app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD') or os.environ.get('DEFAULT_PASSWORD') or 'password'
 # Password given to every other seeded user until they change it on their profile page
 app.config['DEFAULT_PASSWORD'] = os.environ.get('DEFAULT_PASSWORD') or 'password'
+# Members created on first run: (name, uid, role). Each starting password is read from
+# <FIRSTNAME>_PASSWORD in .env (e.g. ANIKA_PASSWORD), falling back to DEFAULT_PASSWORD.
+app.config['MEMBERS'] = [
+    ('Anika Seksaria', 'anikaseksaria', 'Admin'),
+    ('Jailene Tang', 'jailenetang', 'Admin'),
+    ('Joan Kim', 'joankim', 'User'),
+    ('Ainsley Albert', 'ainsleyalbert', 'User'),
+    ('Samanvi Yachareni', 'samanviyachareni', 'User'),
+]
 
 # Browser settings
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'prc-flask-secret-key-set-SECRET_KEY-in-env'
@@ -78,7 +86,6 @@ app.config['IS_PRODUCTION'] = (os.environ.get('IS_PRODUCTION') or 'false').lower
 # Database settings - SQLite in backend/instance/volumes/ (OCS layout)
 dbName = 'user_management'
 os.makedirs(os.path.join(app.instance_path, 'volumes'), exist_ok=True)
-app.config['SQLALCHEMY_DATABASE_NAME'] = dbName
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or \
     'sqlite:///' + os.path.join(app.instance_path, 'volumes', dbName + '.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -219,18 +226,26 @@ class User(db.Model):
 
 
 def initUsers():
-    """ Create the database tables and the default users (skips any that already exist) """
+    """
+    Create the database tables and the default users.
+    New users are created with their starting password; existing users keep their
+    password and profile, but get the role listed here.
+    """
     with app.app_context():
         db.create_all()
-        users = [
-            User(name=app.config['ADMIN_USER'], uid=app.config['ADMIN_UID'], email=app.config['ADMIN_EMAIL'],
-                 password=app.config['ADMIN_PASSWORD'], role="Admin"),
-            User(name='Anika Seksaria', uid='anikaseksaria'),
-            User(name='Jailene Tang', uid='jailenetang'),
-        ]
-        for user in users:
-            if User.query.filter_by(_uid=user.uid).first() is None:
-                user.create()
+        seeds = [(app.config['ADMIN_USER'], app.config['ADMIN_UID'], 'Admin',
+                  app.config['ADMIN_PASSWORD'], app.config['ADMIN_EMAIL'])]
+        for name, uid, role in app.config['MEMBERS']:
+            password = os.environ.get(name.split()[0].upper() + '_PASSWORD') or app.config['DEFAULT_PASSWORD']
+            seeds.append((name, uid, role, password, None))
+
+        for name, uid, role, password, email in seeds:
+            user = User.query.filter_by(_uid=uid).first()
+            if user is None:
+                User(name=name, uid=uid, email=email, password=password, role=role).create()
+            elif user.role != role:
+                user._role = role
+                db.session.commit()
 
 
 # ----------------------------------------------------------------------------
@@ -400,21 +415,7 @@ def index():
     return jsonify({"service": "Poway Recovery Center API", "status": "ok"})
 
 
-# ----------------------------------------------------------------------------
-# Command line (OCS main.py): flask --app backend/main.py custom generate_data
-# ----------------------------------------------------------------------------
-
-custom_cli = AppGroup('custom', help='Custom commands')
-
-
-@custom_cli.command('generate_data')
-def generate_data():
-    initUsers()
-
-
-app.cli.add_command(custom_cli)
-
-# Create the database and default users whenever the app starts
+# Create the database and default users whenever the app starts (python main.py or gunicorn)
 initUsers()
 
 if __name__ == "__main__":

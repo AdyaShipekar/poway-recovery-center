@@ -19,15 +19,18 @@ python backend/main.py      # creates backend/instance/volumes/user_management.d
 ```
 
 ### Accounts
-`backend/main.py` creates these users the first time it runs (existing users are never overwritten):
+`backend/main.py` creates these users when it starts (the list is `MEMBERS` in `main.py`). Existing users keep their password and profile; only their role is updated to match the list.
 
 | Name | Username | Role |
 | --- | --- | --- |
 | Adya Shipekar | `adyashipekar` (or adya.shipekar1@gmail.com) | Admin |
-| Anika Seksaria | `anikaseksaria` | User |
-| Jailene Tang | `jailenetang` | User |
+| Anika Seksaria | `anikaseksaria` | Admin |
+| Jailene Tang | `jailenetang` | Admin |
+| Joan Kim | `joankim` | User |
+| Ainsley Albert | `ainsleyalbert` | User |
+| Samanvi Yachareni | `samanviyachareni` | User |
 
-Passwords come from `backend/.env` (`ADMIN_PASSWORD` for the admin, `DEFAULT_PASSWORD` for everyone else). That file is not committed to git. Anyone can change their password, email, and phone number from their profile page.
+Starting passwords come from `backend/.env`: `ADMIN_PASSWORD` for the site admin and `<FIRSTNAME>_PASSWORD` for each member (e.g. `JOAN_PASSWORD`). That file is not committed to git. Anyone can change their password, email, and phone number from their profile page.
 
 ## Structure
 - `index.html` — homepage
@@ -45,6 +48,8 @@ Passwords come from `backend/.env` (`ADMIN_PASSWORD` for the admin, `DEFAULT_PAS
 - `requirements.txt` — Python dependencies (points to `backend/requirements.txt`)
 - `backend/main.py` — the whole Flask backend in one file: app/CORS/database config, `User` model, `@token_required` JWT cookie guard, REST API, and default users
 - `backend/.env` — secret key and passwords (not committed)
+- `backend/Dockerfile`, `backend/docker-compose.yml` — production server (gunicorn on port 8587), same setup as Open Coding Society flask
+- `.github/workflows/jekyll-gh-pages.yml` — builds the site with `bundle exec jekyll build` (same Jekyll as `make`) and deploys it to GitHub Pages
 - `backend/instance/volumes/user_management.db` — SQLite database (created on first run, not committed)
 
 ## API
@@ -59,8 +64,14 @@ Passwords come from `backend/.env` (`ADMIN_PASSWORD` for the admin, `DEFAULT_PAS
 | DELETE | `/api/user` | Admin only: delete a user `{uid}` |
 
 ## Deploying
-GitHub Pages only serves static files, so the backend must be hosted separately (e.g. Render, Railway, AWS) from the `backend/` folder of this same repo, using `gunicorn main:app`. Then:
-1. Put the backend's https address in `deployedPythonURI` in `js/api/config.js`.
-2. In the backend's environment set `SECRET_KEY`, `ADMIN_PASSWORD`, `DEFAULT_PASSWORD`, `ALLOWED_ORIGINS=https://<github-user>.github.io`, and `IS_PRODUCTION=true` (requires HTTPS).
+**Frontend:** every push to `main` runs `.github/workflows/jekyll-gh-pages.yml`, which publishes the site to https://adyashipekar.github.io/poway-recovery-center/ (repo Settings → Pages → Source must be "GitHub Actions").
+
+**Backend:** GitHub Pages only serves static files, so `backend/` runs on a server, like Open Coding Society flask:
+```bash
+cd backend
+cp /path/to/your/.env .env     # SECRET_KEY, ADMIN_PASSWORD, DEFAULT_PASSWORD, IS_PRODUCTION=true
+docker compose up -d --build   # serves the API on port 8587; database is kept in backend/instance/
+```
+Put it behind HTTPS (e.g. nginx + certbot, as in OCS `nginx_flask_8587.conf`), then set that https address as `deployedPythonURI` in `js/api/config.js` and push. Until then the live site works normally but shows that accounts are not available yet.
 
 The meeting reservations and reflection wall still use browser localStorage. The Mood Room uses a local supportive categorizer and Apple Music search links.

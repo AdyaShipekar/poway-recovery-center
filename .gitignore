@@ -1,6 +1,14 @@
+# Jekyll
 _site/
 .jekyll-cache/
 .bundle/
+
+# Python environments
 .venv/
 venv/
 __pycache__/
+*.py[cod]
+
+# Backend secrets and database
+.env
+backend/instance/

@@ -1,9 +1,17 @@
-# Keep the Flask backend and build tooling out of the GitHub Pages site
+# Site settings
+title: Poway Recovery Center
+description: A compassionate, evidence-informed place to find stability, connection, and a next step that feels possible.
+
+# Files Jekyll should not copy into the site (same approach as Open Coding Society pages)
 exclude:
-  - backend
-  - Makefile
+# Jekyll defaults
+  - vendor
   - Gemfile
   - Gemfile.lock
-  - node_modules
-  - vendor
+# Custom excludes
+  - Makefile
+  - README.md
   - requirements.txt
+  - backend
+  - venv
+  - .venv

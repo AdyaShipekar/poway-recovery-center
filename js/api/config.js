@@ -1,10 +1,10 @@
 // Backend address (same structure as Open Coding Society pages assets/js/api/config.js)
-// Once backend/ is deployed, put its https address here so the live site can reach it.
+// Deployed: put the https address of the deployed backend/ (see backend/Dockerfile) here.
 const deployedPythonURI = "";
 
 export var pythonURI;
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || !deployedPythonURI) {
-    pythonURI = `http://${location.hostname === "127.0.0.1" ? "127.0.0.1" : "localhost"}:8587`;
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    pythonURI = `http://${location.hostname}:8587`;  // Same host name as the page so the login cookie is sent
 } else {
     pythonURI = deployedPythonURI;
 }
@@ -22,6 +22,9 @@ export const fetchOptions = {
 
 // Shared request helper: returns parsed JSON, or throws an Error with the server's message
 export async function apiRequest(path, method = 'GET', body) {
+    if (!pythonURI) {
+        throw new Error("Accounts are not available on this site yet: the Poway Recovery Center server has not been connected.");
+    }
     let response;
     try {
         response = await fetch(pythonURI + path, {
@@ -33,7 +36,7 @@ export async function apiRequest(path, method = 'GET', body) {
     } catch (error) {
         // Network failure: backend not running, or blocked by CORS
         console.log('Possible CORS or Service Down error: ' + error);
-        throw new Error(`Can't reach the Poway Recovery Center server at ${pythonURI}. Make sure the backend is running (make backend).`);
+        throw new Error(`Can't reach the Poway Recovery Center server at ${pythonURI}. Please try again shortly.`);
     }
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
