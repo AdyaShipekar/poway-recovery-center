@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="sass/support-widgets.css">
 </head>
 <body>
   <header class="site-header">
@@ -19,12 +20,6 @@
       <a href="about.html">About Us</a>
     </nav>
   </header>
-
-  <aside class="crisis-banner">
-    <span class="pulse"></span>
-    <div><strong>Need help now?</strong><small>Call or text 988</small></div>
-    <a href="tel:988">988</a>
-  </aside>
 
   <main>
     <section class="hero">
@@ -117,15 +112,6 @@
     </section>
   </main>
 
-  <div class="chatbot" data-chatbot>
-    <button class="chatbot-toggle" aria-label="Open confidential support assistant">✦ <span>Support assistant</span></button>
-    <div class="chatbot-panel" hidden>
-      <div class="chatbot-header"><div><strong>Support assistant</strong><small>Private on this device · not a crisis service</small></div><button class="chatbot-close" aria-label="Close">×</button></div>
-      <div class="chatbot-messages"><div class="bot-message">I’m here with you. What feels most important right now?</div></div>
-      <form class="chatbot-form"><input aria-label="Message" placeholder="Type what you’re experiencing…" autocomplete="off"><button aria-label="Send">↑</button></form>
-      <p class="chatbot-disclaimer">If you may be in immediate danger, call 911. For emotional crisis support, call or text 988.</p>
-    </div>
-  </div>
-  <script src="js/main.js"></script><script type="module" src="js/api/login.js"></script>
+  <script src="js/main.js"></script><script type="module" src="js/api/login.js"></script><script type="module" src="js/support-widgets.js"></script>
 </body>
 </html>
